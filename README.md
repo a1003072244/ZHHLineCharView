@@ -13,7 +13,7 @@
 #define kFillColor [UIColor clearColor] 
 ```  
 即可
-
+![](https://github.com/a1003072244/ZHHLineCharView/blob/master/123.gif)
 
 ![色彩填充效果](https://github.com/a1003072244/ZHHLineCharView/blob/master/有填充色.png)
 ![单纯的折线效果](https://github.com/a1003072244/ZHHLineCharView/blob/master/无填充色.png)
