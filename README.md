@@ -15,5 +15,5 @@
 即可
 
 
-![色彩填充效果](https://github.com/1003072244/ZHHLineCharView/blob/master/Simulator%20Screen%20Shot%202017年7月27日%20上午9.31.04.png)
-![单纯的这小效果](https://github.com/1003072244/ZHHLineCharView/blob/master/Simulator%20Screen%20Shot%202017年7月27日%20上午9.31.25.png)
+![色彩填充效果](https://github.com/a1003072244/ZHHLineCharView/blob/master/Simulator%20Screen%20Shot%202017年7月27日%20上午9.31.04.png)
+![单纯的这小效果]()
