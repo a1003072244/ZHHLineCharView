@@ -17,7 +17,7 @@
 #define KbackColor [UIColor whiteColor]
 
 #define kLineColor [UIColor blueColor]
-#define kFillColor [UIColor clearColor] //不需要填充色 改为clearColor即可
+#define kFillColor [UIColor colorWithRed:0.1 green:0.2 blue:0.3 alpha:0.3]  //不需要填充色 改为clearColor即可
 #define kLineWith 1.0
 
 @interface ZHHLinChartView : UIView
@@ -28,10 +28,8 @@
 //YUnit;//!<y轴单位
 //XUnit;//!<x轴单位
 
-//maxX X轴区间最大值   区间默认从0开始，如果需求不是从0开始 自行更改算法
-//maxY Y轴区间最大值   例如 坐标系是 (年龄，身高)  那么可以maxX=130 maxY=300
 
-//注意 确保 坐标点的X值是从小到大排序的  而不是乱序
+
 
 + (ZHHLinChartView *)zhhLineCharViewWithFrame:(CGRect)frame YLine:(NSArray *)YLine XLine:(NSArray *)XLine YUnit:(NSString *)Yunit XUnit:(NSString *)Xunit points:(NSArray <NSArray<NSString *>*>*)points maxXValue:(CGFloat)maxX maxYValue:(CGFloat)maxY;
 

@@ -16,6 +16,11 @@
 @property (nonatomic, assign)CGFloat Xscale;//!<
 @property (nonatomic, assign)CGFloat Yscale;//!<
 
+//控制渐变色的属性
+@property (nonatomic, assign)CGMutablePathRef mupath;//!<
+@property (nonatomic, assign)CGContextRef gc;//!<
+
+
 @end
 
 static NSInteger YlabelWidth = 30;
@@ -46,6 +51,12 @@ static NSInteger XlabelLineSpace = 4;
     lineCharView.shapelayer.fillColor = kFillColor.CGColor;
     lineCharView.shapelayer.lineWidth = kLineWith;
     [lineCharView.layer addSublayer:lineCharView.shapelayer];
+    
+    UIGraphicsBeginImageContext(lineCharView.bounds.size);
+    lineCharView.gc = UIGraphicsGetCurrentContext();
+    //创建CGMutablePathRef
+    lineCharView.mupath = CGPathCreateMutable();
+
     
     lineCharView.Xscale = (frame.size.width - YlabelWidth)/maxX;
     lineCharView.Yscale = (frame.size.height - YlabelHeight)/maxY;
@@ -95,10 +106,65 @@ static NSInteger XlabelLineSpace = 4;
         [self addNewPoint:obj];
     }];
     if (![kFillColor isEqual:[UIColor clearColor]]) {
-        [self.path addLineToPoint:CGPointMake(YlabelWidth+[points.lastObject.firstObject floatValue]*self.Xscale, self.frame.size.height-YlabelHeight)];
+        CGPoint point = CGPointMake(YlabelWidth+[points.lastObject.firstObject floatValue]*self.Xscale, self.frame.size.height-YlabelHeight);
+        [self.path addLineToPoint:point];
+        CGPathAddLineToPoint(self.mupath, NULL, point.x, point.y);
+
     }
     self.shapelayer.path = self.path.CGPath;
+    
+    
+    
+    //绘制Path
+//    CGRect rect = CGRectMake(0, 40, 60, 50);
+//    CGPathMoveToPoint(path, NULL, CGRectGetMinX(rect), CGRectGetMinY(rect));
+//    CGPathAddLineToPoint(path, NULL, CGRectGetMidX(rect), CGRectGetMaxY(rect));
+//    CGPathAddLineToPoint(path, NULL, CGRectGetWidth(rect), CGRectGetMaxY(rect));
+//    CGPathCloseSubpath(path);
+    
+    //绘制渐变
+    [self drawLinearGradient:self.gc path:self.mupath startColor:[UIColor whiteColor].CGColor endColor:kFillColor.CGColor];
+    
+    //注意释放CGMutablePathRef
+    CGPathRelease(self.mupath);
+    
+    //从Context中获取图像，并显示在界面上
+    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    UIImageView *imgView = [[UIImageView alloc] initWithImage:img];
+    [self addSubview:imgView];
+
 }
+
+- (void)drawLinearGradient:(CGContextRef)context
+                      path:(CGPathRef)path
+                startColor:(CGColorRef)startColor
+                  endColor:(CGColorRef)endColor
+{
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGFloat locations[] = { 0.0, 1.0 };
+    
+    NSArray *colors = @[(__bridge id) startColor, (__bridge id) endColor];
+    
+    CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef) colors, locations);
+    
+    
+    CGRect pathRect = CGPathGetBoundingBox(path);
+    
+    //具体方向可根据需求修改
+    CGPoint startPoint = CGPointMake(CGRectGetMidX(pathRect), CGRectGetMaxY(pathRect));
+    CGPoint endPoint = CGPointMake(CGRectGetMidX(pathRect), CGRectGetMinY(pathRect));
+    
+    CGContextSaveGState(context);
+    CGContextAddPath(context, path);
+    CGContextClip(context);
+    CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
+    CGContextRestoreGState(context);
+    CGGradientRelease(gradient);
+    CGColorSpaceRelease(colorSpace);
+}
+
 
 - (void)addNewPoint:(NSArray<NSString *>*)newPoint {
     CGFloat x = [[newPoint firstObject] floatValue];
@@ -110,9 +176,13 @@ static NSInteger XlabelLineSpace = 4;
             [self.path moveToPoint:CGPointMake(YlabelWidth+x*self.Xscale, self.frame.size.height-y*self.Yscale-YlabelHeight)];
         } else {
             [self.path moveToPoint:CGPointMake(YlabelWidth+x*self.Xscale, self.frame.size.height-YlabelHeight)];
+            CGPathMoveToPoint(self.mupath, NULL, YlabelWidth+x*self.Xscale, self.frame.size.height-YlabelHeight);
+
         }
+        
     });
     [self.path addLineToPoint:CGPointMake(YlabelWidth+x*self.Xscale, self.frame.size.height-y*self.Yscale-YlabelHeight)];
+    CGPathAddLineToPoint(self.mupath, NULL, YlabelWidth+x*self.Xscale, self.frame.size.height-y*self.Yscale-YlabelHeight);
 
 }
 
